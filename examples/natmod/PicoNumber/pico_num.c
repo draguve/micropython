@@ -134,6 +134,7 @@ mp_obj_t mpy_init(mp_obj_fun_bc_t *self, size_t n_args, size_t n_kw, mp_obj_t *a
     mp_store_global(MP_QSTR_mul, MP_OBJ_FROM_PTR(&fix16_mul_obj));
     mp_store_global(MP_QSTR_div, MP_OBJ_FROM_PTR(&fix16_div_obj));
     mp_store_global(MP_QSTR_fdiv, MP_OBJ_FROM_PTR(&fix16_fdiv_obj));
+    mp_store_global(MP_QSTR_fdiv, MP_OBJ_FROM_PTR(&fix16_modulus_obj));
 
     // Initialise the type.
     mp_type_fix16.base.type = (void*)&mp_type_type;
