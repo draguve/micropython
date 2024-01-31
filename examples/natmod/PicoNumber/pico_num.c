@@ -104,16 +104,16 @@ STATIC mp_obj_t modulus(mp_obj_t a_obj,mp_obj_t b_obj) {
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_modulus_obj, modulus);
 
-// STATIC mp_obj_t pow(mp_obj_t a_obj,mp_obj_t b_obj) {
-//     mp_obj_fix16_t *a = MP_OBJ_TO_PTR(a_obj);
-//     mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
+STATIC mp_obj_t fix16_pow(mp_obj_t a_obj,mp_obj_t b_obj) {
+    mp_obj_fix16_t *a = MP_OBJ_TO_PTR(a_obj);
+    mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
 
-//     mp_obj_fix16_t *o = mp_obj_malloc(mp_obj_fix16_t, mp_obj_get_type(a_obj));
-//     o->n = fix16_pow(a->n,b->n); 
+    mp_obj_fix16_t *o = mp_obj_malloc(mp_obj_fix16_t, mp_obj_get_type(a_obj));
+    o->n = qpow(a->n,b->n); 
 
-//     return MP_OBJ_FROM_PTR(o);
-// }
-// STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_pow_obj, pow);
+    return MP_OBJ_FROM_PTR(o);
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_pow_obj, fix16_pow);
 
 STATIC mp_obj_t to_string(mp_obj_t self_in) {
     mp_obj_fix16_t *self = MP_OBJ_TO_PTR(self_in);
@@ -126,7 +126,18 @@ STATIC mp_obj_t to_string(mp_obj_t self_in) {
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(fix16_to_string_obj, to_string);
 
-mp_map_elem_t fix16_locals_dict_table[1];
+STATIC mp_obj_t to_bytes(mp_obj_t self_in) {
+    mp_obj_fix16_t *self = MP_OBJ_TO_PTR(self_in);
+    char temp[16]; //max length according to the string function docs
+	const int r = qsprint(self->n, temp, sizeof temp);
+    if (r==-1)
+		mp_raise_ValueError(MP_ERROR_TEXT("Could not convert to string"));
+    mp_obj_t obj = mp_obj_new_bytes((byte *)temp,r);
+    return obj;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_1(fix16_to_bytes_obj, to_bytes);
+
+mp_map_elem_t fix16_locals_dict_table[2];
 STATIC MP_DEFINE_CONST_DICT(fix16_locals_dict, fix16_locals_dict_table);
 
 // This is the entry point and is called when the module is imported
@@ -141,6 +152,7 @@ mp_obj_t mpy_init(mp_obj_fun_bc_t *self, size_t n_args, size_t n_kw, mp_obj_t *a
     mp_store_global(MP_QSTR_div, MP_OBJ_FROM_PTR(&fix16_div_obj));
     mp_store_global(MP_QSTR_fdiv, MP_OBJ_FROM_PTR(&fix16_fdiv_obj));
     mp_store_global(MP_QSTR_fdiv, MP_OBJ_FROM_PTR(&fix16_modulus_obj));
+    mp_store_global(MP_QSTR_pow, MP_OBJ_FROM_PTR(&fix16_pow_obj));
 
     // Initialise the type.
     mp_type_fix16.base.type = (void*)&mp_type_type;
@@ -148,8 +160,9 @@ mp_obj_t mpy_init(mp_obj_fun_bc_t *self, size_t n_args, size_t n_kw, mp_obj_t *a
     mp_type_fix16.name = MP_QSTR_PicoNumber;
     MP_OBJ_TYPE_SET_SLOT(&mp_type_fix16, make_new, fix16_make_new, 0);
 
-    fix16_locals_dict_table[0] = (mp_map_elem_t){ MP_OBJ_NEW_QSTR(MP_QSTR_To_String), MP_OBJ_FROM_PTR(&fix16_to_string_obj) };
-    MP_OBJ_TYPE_SET_SLOT(&mp_type_fix16, locals_dict, (void*)&fix16_locals_dict, 1);
+    fix16_locals_dict_table[0] = (mp_map_elem_t){ MP_OBJ_NEW_QSTR(MP_QSTR_tostr), MP_OBJ_FROM_PTR(&fix16_to_string_obj) };
+    fix16_locals_dict_table[1] = (mp_map_elem_t){ MP_OBJ_NEW_QSTR(MP_QSTR_tobytes), MP_OBJ_FROM_PTR(&fix16_to_bytes_obj) };
+    MP_OBJ_TYPE_SET_SLOT(&mp_type_fix16, locals_dict, (void*)&fix16_locals_dict, 2);
 
     // Make the Factorial type available on the module.
     mp_store_global(MP_QSTR_PicoNumber, MP_OBJ_FROM_PTR(&mp_type_fix16));
