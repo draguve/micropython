@@ -12,14 +12,15 @@
 
 // Include the header file to get access to the MicroPython API
 #include "py/dynruntime.h"
-#include "fix16.h"
+#include "m_string.h"
+#include "q.h"
 
 mp_obj_full_type_t mp_type_fix16;
 
 // This is the internal state of a Factorial instance.
 typedef struct {
     mp_obj_base_t base;
-    fix16_t n;
+    q_t n;
 } mp_obj_fix16_t;
 
 // Essentially Factorial.__new__ (but also kind of __init__).
@@ -28,7 +29,7 @@ STATIC mp_obj_t fix16_make_new(const mp_obj_type_t *type, size_t n_args, size_t 
     mp_arg_check_num(n_args, n_kw, 1, 1, false);
 
     mp_obj_fix16_t *o = mp_obj_malloc(mp_obj_fix16_t, type);
-    o->n = fix16_from_int(mp_obj_get_int(args_in[0]));
+    o->n = qint(mp_obj_get_int(args_in[0]));
 
     return MP_OBJ_FROM_PTR(o);
 }
@@ -39,7 +40,7 @@ STATIC mp_obj_t add(mp_obj_t a_obj,mp_obj_t b_obj) {
     mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
 
     mp_obj_fix16_t *o = mp_obj_malloc(mp_obj_fix16_t, mp_obj_get_type(a_obj));
-    o->n = fix16_add(a->n,b->n);
+    o->n = qadd(a->n,b->n);
 
     return MP_OBJ_FROM_PTR(o);
 }
@@ -50,7 +51,7 @@ STATIC mp_obj_t sub(mp_obj_t a_obj,mp_obj_t b_obj) {
     mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
 
     mp_obj_fix16_t *o = mp_obj_malloc(mp_obj_fix16_t, mp_obj_get_type(a_obj));
-    o->n = fix16_sub(a->n,b->n);
+    o->n = qsub(a->n,b->n);
 
     return MP_OBJ_FROM_PTR(o);
 }
@@ -61,7 +62,7 @@ STATIC mp_obj_t mul(mp_obj_t a_obj,mp_obj_t b_obj) {
     mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
 
     mp_obj_fix16_t *o = mp_obj_malloc(mp_obj_fix16_t, mp_obj_get_type(a_obj));
-    o->n = fix16_mul(a->n,b->n);
+    o->n = qmul(a->n,b->n);
 
     return MP_OBJ_FROM_PTR(o);
 }
@@ -72,7 +73,8 @@ STATIC mp_obj_t div(mp_obj_t a_obj,mp_obj_t b_obj) {
     mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
 
     mp_obj_fix16_t *o = mp_obj_malloc(mp_obj_fix16_t, mp_obj_get_type(a_obj));
-    o->n = fix16_div(a->n,b->n);
+    check_div0(a->n,b->n);
+    o->n = qdiv(a->n,b->n);
 
     return MP_OBJ_FROM_PTR(o);
 }
@@ -83,7 +85,8 @@ STATIC mp_obj_t fdiv(mp_obj_t a_obj,mp_obj_t b_obj) {
     mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
 
     mp_obj_fix16_t *o = mp_obj_malloc(mp_obj_fix16_t, mp_obj_get_type(a_obj));
-    o->n = fix16_floor(fix16_div(a->n,b->n)); 
+    check_div0(a->n,b->n);
+    o->n = qfloor(qdiv(a->n,b->n)); 
 
     return MP_OBJ_FROM_PTR(o);
 }
@@ -94,7 +97,8 @@ STATIC mp_obj_t modulus(mp_obj_t a_obj,mp_obj_t b_obj) {
     mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
 
     mp_obj_fix16_t *o = mp_obj_malloc(mp_obj_fix16_t, mp_obj_get_type(a_obj));
-    o->n = fix16_mod(a->n,b->n); 
+    check_div0(a->n,b->n);
+    o->n = qrem(a->n,b->n); 
 
     return MP_OBJ_FROM_PTR(o);
 }
@@ -113,9 +117,11 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_modulus_obj, modulus);
 
 STATIC mp_obj_t to_string(mp_obj_t self_in) {
     mp_obj_fix16_t *self = MP_OBJ_TO_PTR(self_in);
-    char temp[13]; //max length according to the string function docs
-    int length = fix16_to_str(self->n,temp,4);
-    mp_obj_t obj = mp_obj_new_str(temp,length);
+    char temp[16]; //max length according to the string function docs
+	const int r = qsprint(self->n, temp, sizeof temp);
+    if (r==-1)
+		mp_raise_ValueError(MP_ERROR_TEXT("Could not convert to string"));
+    mp_obj_t obj = mp_obj_new_str(temp,r);
     return obj;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(fix16_to_string_obj, to_string);
