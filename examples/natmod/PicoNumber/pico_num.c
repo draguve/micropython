@@ -45,10 +45,76 @@ STATIC mp_obj_t add(mp_obj_t a_obj,mp_obj_t b_obj) {
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_add_obj, add);
 
+STATIC mp_obj_t sub(mp_obj_t a_obj,mp_obj_t b_obj) {
+    mp_obj_fix16_t *a = MP_OBJ_TO_PTR(a_obj);
+    mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
+
+    mp_obj_fix16_t *o = mp_obj_malloc(mp_obj_fix16_t, mp_obj_get_type(a_obj));
+    o->n = fix16_sub(a->n,b->n);
+
+    return MP_OBJ_FROM_PTR(o);
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_sub_obj, sub);
+
+STATIC mp_obj_t mul(mp_obj_t a_obj,mp_obj_t b_obj) {
+    mp_obj_fix16_t *a = MP_OBJ_TO_PTR(a_obj);
+    mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
+
+    mp_obj_fix16_t *o = mp_obj_malloc(mp_obj_fix16_t, mp_obj_get_type(a_obj));
+    o->n = fix16_mul(a->n,b->n);
+
+    return MP_OBJ_FROM_PTR(o);
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_mul_obj, mul);
+
+STATIC mp_obj_t div(mp_obj_t a_obj,mp_obj_t b_obj) {
+    mp_obj_fix16_t *a = MP_OBJ_TO_PTR(a_obj);
+    mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
+
+    mp_obj_fix16_t *o = mp_obj_malloc(mp_obj_fix16_t, mp_obj_get_type(a_obj));
+    o->n = fix16_div(a->n,b->n);
+
+    return MP_OBJ_FROM_PTR(o);
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_div_obj, div);
+
+STATIC mp_obj_t fdiv(mp_obj_t a_obj,mp_obj_t b_obj) {
+    mp_obj_fix16_t *a = MP_OBJ_TO_PTR(a_obj);
+    mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
+
+    mp_obj_fix16_t *o = mp_obj_malloc(mp_obj_fix16_t, mp_obj_get_type(a_obj));
+    o->n = fix16_floor(fix16_div(a->n,b->n)); 
+
+    return MP_OBJ_FROM_PTR(o);
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_fdiv_obj, fdiv);
+
+STATIC mp_obj_t modulus(mp_obj_t a_obj,mp_obj_t b_obj) {
+    mp_obj_fix16_t *a = MP_OBJ_TO_PTR(a_obj);
+    mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
+
+    mp_obj_fix16_t *o = mp_obj_malloc(mp_obj_fix16_t, mp_obj_get_type(a_obj));
+    o->n = fix16_mod(a->n,b->n); 
+
+    return MP_OBJ_FROM_PTR(o);
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_modulus_obj, modulus);
+
+// STATIC mp_obj_t pow(mp_obj_t a_obj,mp_obj_t b_obj) {
+//     mp_obj_fix16_t *a = MP_OBJ_TO_PTR(a_obj);
+//     mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
+
+//     mp_obj_fix16_t *o = mp_obj_malloc(mp_obj_fix16_t, mp_obj_get_type(a_obj));
+//     o->n = fix16_pow(a->n,b->n); 
+
+//     return MP_OBJ_FROM_PTR(o);
+// }
+// STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_pow_obj, pow);
+
 STATIC mp_obj_t to_string(mp_obj_t self_in) {
     mp_obj_fix16_t *self = MP_OBJ_TO_PTR(self_in);
     char temp[13]; //max length according to the string function docs
-    int length = fix16_to_str(self->n,temp,2);
+    int length = fix16_to_str(self->n,temp,4);
     mp_obj_t obj = mp_obj_new_str(temp,length);
     return obj;
 }
@@ -64,6 +130,10 @@ mp_obj_t mpy_init(mp_obj_fun_bc_t *self, size_t n_args, size_t n_kw, mp_obj_t *a
 
     //put the add function as a static global function
     mp_store_global(MP_QSTR_add, MP_OBJ_FROM_PTR(&fix16_add_obj));
+    mp_store_global(MP_QSTR_sub, MP_OBJ_FROM_PTR(&fix16_sub_obj));
+    mp_store_global(MP_QSTR_mul, MP_OBJ_FROM_PTR(&fix16_mul_obj));
+    mp_store_global(MP_QSTR_div, MP_OBJ_FROM_PTR(&fix16_div_obj));
+    mp_store_global(MP_QSTR_fdiv, MP_OBJ_FROM_PTR(&fix16_fdiv_obj));
 
     // Initialise the type.
     mp_type_fix16.base.type = (void*)&mp_type_type;
