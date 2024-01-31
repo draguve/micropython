@@ -12,6 +12,7 @@
 
 // Include the header file to get access to the MicroPython API
 #include "py/dynruntime.h"
+#include "fix16.h"
 
 // This is type(Factorial)
 mp_obj_full_type_t mp_type_factorial;
