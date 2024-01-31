@@ -2,7 +2,7 @@
 MPY_DIR = ../../..
 
 # Name of module
-MOD = PicoNumber
+MOD = PicoNumber_$(ARCH)
 
 # Source files (.c or .py)
 SRC = pico_num.c fix16.c fix16_exp.c fix16_sqrt.c fix16_str.c fix16_trig.c

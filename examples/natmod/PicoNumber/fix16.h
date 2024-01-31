@@ -36,7 +36,7 @@ extern "C"
 
 #define FIXMATH_FAST_SIN
 #define FIXMATH_NO_CACHE
-#define FIXMATH_NO_OVERFLOW
+//#define FIXMATH_NO_OVERFLOW
 #define FIXMATH_NO_CTYPE
 
 typedef int32_t fix16_t;
