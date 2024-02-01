@@ -34,7 +34,7 @@ STATIC mp_obj_t fix16_make_new(const mp_obj_type_t *type, size_t n_args, size_t 
     return MP_OBJ_FROM_PTR(o);
 }
 
-STATIC mp_obj_t add(mp_obj_t a_obj,mp_obj_t b_obj) {
+STATIC mp_obj_t fix16_add(mp_obj_t a_obj,mp_obj_t b_obj) {
     // Extract the integer from the MicroPython input object
     mp_obj_fix16_t *a = MP_OBJ_TO_PTR(a_obj);
     mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
@@ -44,9 +44,9 @@ STATIC mp_obj_t add(mp_obj_t a_obj,mp_obj_t b_obj) {
 
     return MP_OBJ_FROM_PTR(o);
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_add_obj, add);
+STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_add_obj, fix16_add);
 
-STATIC mp_obj_t sub(mp_obj_t a_obj,mp_obj_t b_obj) {
+STATIC mp_obj_t fix16_sub(mp_obj_t a_obj,mp_obj_t b_obj) {
     mp_obj_fix16_t *a = MP_OBJ_TO_PTR(a_obj);
     mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
 
@@ -55,9 +55,9 @@ STATIC mp_obj_t sub(mp_obj_t a_obj,mp_obj_t b_obj) {
 
     return MP_OBJ_FROM_PTR(o);
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_sub_obj, sub);
+STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_sub_obj, fix16_sub);
 
-STATIC mp_obj_t mul(mp_obj_t a_obj,mp_obj_t b_obj) {
+STATIC mp_obj_t fix16_mul(mp_obj_t a_obj,mp_obj_t b_obj) {
     mp_obj_fix16_t *a = MP_OBJ_TO_PTR(a_obj);
     mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
 
@@ -66,9 +66,9 @@ STATIC mp_obj_t mul(mp_obj_t a_obj,mp_obj_t b_obj) {
 
     return MP_OBJ_FROM_PTR(o);
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_mul_obj, mul);
+STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_mul_obj, fix16_mul);
 
-STATIC mp_obj_t div(mp_obj_t a_obj,mp_obj_t b_obj) {
+STATIC mp_obj_t fix16_div(mp_obj_t a_obj,mp_obj_t b_obj) {
     mp_obj_fix16_t *a = MP_OBJ_TO_PTR(a_obj);
     mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
 
@@ -78,9 +78,9 @@ STATIC mp_obj_t div(mp_obj_t a_obj,mp_obj_t b_obj) {
 
     return MP_OBJ_FROM_PTR(o);
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_div_obj, div);
+STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_div_obj, fix16_div);
 
-STATIC mp_obj_t fdiv(mp_obj_t a_obj,mp_obj_t b_obj) {
+STATIC mp_obj_t fix16_fdiv(mp_obj_t a_obj,mp_obj_t b_obj) {
     mp_obj_fix16_t *a = MP_OBJ_TO_PTR(a_obj);
     mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
 
@@ -90,9 +90,9 @@ STATIC mp_obj_t fdiv(mp_obj_t a_obj,mp_obj_t b_obj) {
 
     return MP_OBJ_FROM_PTR(o);
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_fdiv_obj, fdiv);
+STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_fdiv_obj, fix16_fdiv);
 
-STATIC mp_obj_t modulus(mp_obj_t a_obj,mp_obj_t b_obj) {
+STATIC mp_obj_t fix16_modulus(mp_obj_t a_obj,mp_obj_t b_obj) {
     mp_obj_fix16_t *a = MP_OBJ_TO_PTR(a_obj);
     mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
 
@@ -102,7 +102,7 @@ STATIC mp_obj_t modulus(mp_obj_t a_obj,mp_obj_t b_obj) {
 
     return MP_OBJ_FROM_PTR(o);
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_modulus_obj, modulus);
+STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_modulus_obj, fix16_modulus);
 
 STATIC mp_obj_t fix16_pow(mp_obj_t a_obj,mp_obj_t b_obj) {
     mp_obj_fix16_t *a = MP_OBJ_TO_PTR(a_obj);
