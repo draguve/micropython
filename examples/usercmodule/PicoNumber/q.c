@@ -190,6 +190,16 @@ q_t qals(const q_t a, const q_t b)      { return qsat((lu_t)a << b); }
 q_t qsign(const q_t a)                  { return qisnegative(a) ? -QINT(1) : QINT(1); }
 q_t qsignum(const q_t a)                { return a ? qsign(a) : QINT(0); }
 
+q_t qrotr(const q_t x, const q_t b){
+    uint n = (u_t)qtoi(b);
+    return (x >> n % 32) | (x << (32-n) % 32);
+}
+
+q_t qrotl(const q_t x, const q_t b){
+    uint n = (u_t)qtoi(b);
+    return (x << n % 32) | (x >> (32-n) % 32);
+}
+
 q_t qapproxequal(const q_t a, const q_t b, const q_t epsilon) {
 	assert(qeqmore(epsilon, qint(0))); 
 	return QINT(qless(qabs(qsub(a, b)), epsilon)); 

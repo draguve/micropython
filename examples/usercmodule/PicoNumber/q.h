@@ -164,6 +164,9 @@ q_t qcopysign(q_t a, q_t b);
 q_t qsign(q_t a);
 q_t qsignum(q_t a);
 
+q_t qrotr(q_t x,q_t b);
+q_t qrotl(q_t x,q_t b);
+
 q_t qadd(q_t a, q_t b);
 q_t qsub(q_t a, q_t b);
 q_t qmul(q_t a, q_t b);
