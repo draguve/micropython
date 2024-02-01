@@ -11,7 +11,7 @@
 */
 
 // Include the header file to get access to the MicroPython API
-#include "py/dynruntime.h"
+//#include "py/runtime.h"
 #include "m_string.h"
 #include "q.h"
 
@@ -137,36 +137,43 @@ STATIC mp_obj_t to_bytes(mp_obj_t self_in) {
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(fix16_to_bytes_obj, to_bytes);
 
-mp_map_elem_t fix16_locals_dict_table[2];
+STATIC const mp_rom_map_elem_t fix16_locals_dict_table[] = {
+    { MP_ROM_QSTR(MP_QSTR_tobytes), MP_OBJ_FROM_PTR(&fix16_to_bytes_obj) },
+    { MP_ROM_QSTR(MP_QSTR_tostr), MP_OBJ_FROM_PTR(&fix16_to_string_obj) }
+};
 STATIC MP_DEFINE_CONST_DICT(fix16_locals_dict, fix16_locals_dict_table);
 
-// This is the entry point and is called when the module is imported
-mp_obj_t mpy_init(mp_obj_fun_bc_t *self, size_t n_args, size_t n_kw, mp_obj_t *args) {
-    // This must be first, it sets up the globals dict and other things
-    MP_DYNRUNTIME_INIT_ENTRY
+MP_DEFINE_CONST_OBJ_TYPE(
+    PicoNumber_type_Number,
+    MP_QSTR_PicoNumber,
+    MP_TYPE_FLAG_NONE,
+    make_new, fix16_make_new,
+    locals_dict, &fix16_locals_dict
+    );
 
-    //put the add function as a static global function
-    mp_store_global(MP_QSTR_add, MP_OBJ_FROM_PTR(&fix16_add_obj));
-    mp_store_global(MP_QSTR_sub, MP_OBJ_FROM_PTR(&fix16_sub_obj));
-    mp_store_global(MP_QSTR_mul, MP_OBJ_FROM_PTR(&fix16_mul_obj));
-    mp_store_global(MP_QSTR_div, MP_OBJ_FROM_PTR(&fix16_div_obj));
-    mp_store_global(MP_QSTR_fdiv, MP_OBJ_FROM_PTR(&fix16_fdiv_obj));
-    mp_store_global(MP_QSTR_fdiv, MP_OBJ_FROM_PTR(&fix16_modulus_obj));
-    mp_store_global(MP_QSTR_pow, MP_OBJ_FROM_PTR(&fix16_pow_obj));
+// Define all attributes of the module.
+// Table entries are key/value pairs of the attribute name (a string)
+// and the MicroPython object reference.
+// All identifiers and strings are written as MP_QSTR_xxx and will be
+// optimized to word-sized integers by the build system (interned strings).
+STATIC const mp_rom_map_elem_t fix16_module_globals_table[] = {
+    { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_PicoNumber) },
+    { MP_ROM_QSTR(MP_QSTR_PicoNumber),    MP_ROM_PTR(&PicoNumber_type_Number) },
+    { MP_ROM_QSTR(MP_QSTR_add),    MP_ROM_PTR(&fix16_add_obj) },
+    { MP_ROM_QSTR(MP_QSTR_sub),    MP_ROM_PTR(&fix16_sub_obj) },
+    { MP_ROM_QSTR(MP_QSTR_mul),    MP_ROM_PTR(&fix16_mul_obj) },
+    { MP_ROM_QSTR(MP_QSTR_div),    MP_ROM_PTR(&fix16_div_obj) },
+    { MP_ROM_QSTR(MP_QSTR_fdiv),    MP_ROM_PTR(&fix16_fdiv_obj) },
+    { MP_ROM_QSTR(MP_QSTR_rem),    MP_ROM_PTR(&fix16_modulus_obj) },
+    { MP_ROM_QSTR(MP_QSTR_pow),    MP_ROM_PTR(&fix16_pow_obj) },
+};
+STATIC MP_DEFINE_CONST_DICT(fix16_module_globals, fix16_module_globals_table);
 
-    // Initialise the type.
-    mp_type_fix16.base.type = (void*)&mp_type_type;
-    mp_type_fix16.flags = MP_TYPE_FLAG_NONE;
-    mp_type_fix16.name = MP_QSTR_PicoNumber;
-    MP_OBJ_TYPE_SET_SLOT(&mp_type_fix16, make_new, fix16_make_new, 0);
+// Define module object.
+const mp_obj_module_t fix16_user_cmodule = {
+    .base = { &mp_type_module },
+    .globals = (mp_obj_dict_t *)&fix16_module_globals,
+};
 
-    fix16_locals_dict_table[0] = (mp_map_elem_t){ MP_OBJ_NEW_QSTR(MP_QSTR_tostr), MP_OBJ_FROM_PTR(&fix16_to_string_obj) };
-    fix16_locals_dict_table[1] = (mp_map_elem_t){ MP_OBJ_NEW_QSTR(MP_QSTR_tobytes), MP_OBJ_FROM_PTR(&fix16_to_bytes_obj) };
-    MP_OBJ_TYPE_SET_SLOT(&mp_type_fix16, locals_dict, (void*)&fix16_locals_dict, 2);
-
-    // Make the Factorial type available on the module.
-    mp_store_global(MP_QSTR_PicoNumber, MP_OBJ_FROM_PTR(&mp_type_fix16));
-
-    // This must be last, it restores the globals dict
-    MP_DYNRUNTIME_INIT_EXIT
-}
+// Register the module to make it available in Python.
+MP_REGISTER_MODULE(MP_QSTR_PicoNumber, fix16_user_cmodule);

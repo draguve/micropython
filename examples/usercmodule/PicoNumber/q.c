@@ -29,7 +29,7 @@
 #include <limits.h>
 #include "m_string.h"
 #include <string.h>
-#include "py/dynruntime.h"
+#include "py/runtime.h"
 
 #pragma GCC diagnostic ignored "-Wunused-variable"
 #pragma GCC diagnostic ignored "-Wunused-function"
