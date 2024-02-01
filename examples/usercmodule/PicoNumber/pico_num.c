@@ -115,13 +115,13 @@ STATIC mp_obj_t fix16_pow(mp_obj_t a_obj,mp_obj_t b_obj) {
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_pow_obj, fix16_pow);
 
-STATIC mp_obj_t fix16_not(mp_obj_t a_obj) {
+STATIC mp_obj_t fix16_invert(mp_obj_t a_obj) {
     mp_obj_fix16_t *a = MP_OBJ_TO_PTR(a_obj);
     mp_obj_fix16_t *o = mp_obj_malloc(mp_obj_fix16_t, mp_obj_get_type(a_obj));
     o->n = qinvert(a->n);
     return MP_OBJ_FROM_PTR(o);
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_1(fix16_not_obj, fix16_not);
+STATIC MP_DEFINE_CONST_FUN_OBJ_1(fix16_invert_obj, fix16_invert);
 
 STATIC mp_obj_t fix16_or(mp_obj_t a_obj,mp_obj_t b_obj) {
     mp_obj_fix16_t *a = MP_OBJ_TO_PTR(a_obj);
@@ -211,6 +211,48 @@ STATIC mp_obj_t fix16_rotl(mp_obj_t a_obj,mp_obj_t b_obj) {
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_rotl_obj, fix16_rotl);
 
+STATIC mp_obj_t fix16_less(mp_obj_t a_obj,mp_obj_t b_obj) {
+    mp_obj_fix16_t *a = MP_OBJ_TO_PTR(a_obj);
+    mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
+    return mp_obj_new_bool(a->n < b->n);
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_less_obj, fix16_less);
+
+STATIC mp_obj_t fix16_eqless(mp_obj_t a_obj,mp_obj_t b_obj) {
+    mp_obj_fix16_t *a = MP_OBJ_TO_PTR(a_obj);
+    mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
+    return mp_obj_new_bool(a->n <= b->n);
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_eqless_obj, fix16_eqless);
+
+STATIC mp_obj_t fix16_more(mp_obj_t a_obj,mp_obj_t b_obj) {
+    mp_obj_fix16_t *a = MP_OBJ_TO_PTR(a_obj);
+    mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
+    return mp_obj_new_bool(a->n > b->n);
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_more_obj, fix16_more);
+
+STATIC mp_obj_t fix16_eqmore(mp_obj_t a_obj,mp_obj_t b_obj) {
+    mp_obj_fix16_t *a = MP_OBJ_TO_PTR(a_obj);
+    mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
+    return mp_obj_new_bool(a->n >= b->n);
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_eqmore_obj, fix16_eqmore);
+
+STATIC mp_obj_t fix16_equal(mp_obj_t a_obj,mp_obj_t b_obj) {
+    mp_obj_fix16_t *a = MP_OBJ_TO_PTR(a_obj);
+    mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
+    return mp_obj_new_bool(a->n == b->n);
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_equal_obj, fix16_equal);
+
+STATIC mp_obj_t fix16_notequal(mp_obj_t a_obj,mp_obj_t b_obj) {
+    mp_obj_fix16_t *a = MP_OBJ_TO_PTR(a_obj);
+    mp_obj_fix16_t *b = MP_OBJ_TO_PTR(b_obj);
+    return mp_obj_new_bool(a->n != b->n);
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_notequal_obj, fix16_notequal);
+
 STATIC mp_obj_t to_string(mp_obj_t self_in) {
     mp_obj_fix16_t *self = MP_OBJ_TO_PTR(self_in);
     char temp[16]; //max length according to the string function docs
@@ -262,7 +304,7 @@ STATIC const mp_rom_map_elem_t fix16_module_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR_fdiv),    MP_ROM_PTR(&fix16_fdiv_obj) },
     { MP_ROM_QSTR(MP_QSTR_rem),    MP_ROM_PTR(&fix16_modulus_obj) },
     { MP_ROM_QSTR(MP_QSTR_pow),    MP_ROM_PTR(&fix16_pow_obj) },
-    { MP_ROM_QSTR(MP_QSTR_not),    MP_ROM_PTR(&fix16_not_obj) },
+    { MP_ROM_QSTR(MP_QSTR_invert),    MP_ROM_PTR(&fix16_invert_obj) },
     { MP_ROM_QSTR(MP_QSTR_or),    MP_ROM_PTR(&fix16_or_obj) },
     { MP_ROM_QSTR(MP_QSTR_and),    MP_ROM_PTR(&fix16_and_obj) },
     { MP_ROM_QSTR(MP_QSTR_xor),    MP_ROM_PTR(&fix16_xor_obj) },
@@ -271,6 +313,12 @@ STATIC const mp_rom_map_elem_t fix16_module_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR_lsr),    MP_ROM_PTR(&fix16_lsr_obj) },
     { MP_ROM_QSTR(MP_QSTR_rotl),    MP_ROM_PTR(&fix16_rotl_obj) },
     { MP_ROM_QSTR(MP_QSTR_rotr),    MP_ROM_PTR(&fix16_rotr_obj) },
+    { MP_ROM_QSTR(MP_QSTR_less),    MP_ROM_PTR(&fix16_less_obj) },
+    { MP_ROM_QSTR(MP_QSTR_eqless),    MP_ROM_PTR(&fix16_eqless_obj) },
+    { MP_ROM_QSTR(MP_QSTR_more),    MP_ROM_PTR(&fix16_more_obj) },
+    { MP_ROM_QSTR(MP_QSTR_eqmore),    MP_ROM_PTR(&fix16_eqmore_obj) },
+    { MP_ROM_QSTR(MP_QSTR_equal),    MP_ROM_PTR(&fix16_equal_obj) },
+    { MP_ROM_QSTR(MP_QSTR_notequal),    MP_ROM_PTR(&fix16_notequal_obj) },
 };
 STATIC MP_DEFINE_CONST_DICT(fix16_module_globals, fix16_module_globals_table);
 
