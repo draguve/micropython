@@ -15,6 +15,7 @@
 #include "m_string.h"
 #include "q.h"
 
+//STATIC const mp_obj_type_t PicoNumber_type_Number;
 mp_obj_full_type_t mp_type_fix16;
 
 // This is the internal state of a Factorial instance.
@@ -23,8 +24,37 @@ typedef struct {
     q_t n;
 } mp_obj_fix16_t;
 
-// Essentially Factorial.__new__ (but also kind of __init__).
-// Takes a single argument (the number to find the factorial of)
+
+STATIC mp_obj_t to_string(mp_obj_t self_in) {
+    mp_obj_fix16_t *self = MP_OBJ_TO_PTR(self_in);
+    char temp[16]; //max length according to the string function docs
+    const int r = qsprint(self->n, temp, sizeof temp);
+    if (r==-1)
+    mp_raise_ValueError(MP_ERROR_TEXT("Could not convert to string"));
+    mp_obj_t obj = mp_obj_new_str(temp,r);
+    return obj;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_1(fix16_to_string_obj, to_string);
+
+STATIC mp_obj_t to_bytes(mp_obj_t self_in) {
+    mp_obj_fix16_t *self = MP_OBJ_TO_PTR(self_in);
+    char temp[16]; //max length according to the string function docs
+    const int r = qsprint(self->n, temp, sizeof temp);
+    if (r==-1)
+    mp_raise_ValueError(MP_ERROR_TEXT("Could not convert to string"));
+    mp_obj_t obj = mp_obj_new_bytes((byte *)temp,r);
+    return obj;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_1(fix16_to_bytes_obj, to_bytes);
+
+
+STATIC const mp_rom_map_elem_t fix16_locals_dict_table[] = {
+{ MP_ROM_QSTR(MP_QSTR_tobytes), MP_OBJ_FROM_PTR(&fix16_to_bytes_obj) },
+{ MP_ROM_QSTR(MP_QSTR_tostr), MP_OBJ_FROM_PTR(&fix16_to_string_obj) }
+};
+STATIC MP_DEFINE_CONST_DICT(fix16_locals_dict, fix16_locals_dict_table);
+
+// Essentially PicoNumber.__new__ (but also kind of __init__).
 STATIC mp_obj_t fix16_make_new(const mp_obj_type_t *type, size_t n_args, size_t n_kw, const mp_obj_t *args_in) {
     mp_arg_check_num(n_args, n_kw, 1, 1, false);
 
@@ -33,6 +63,50 @@ STATIC mp_obj_t fix16_make_new(const mp_obj_type_t *type, size_t n_args, size_t 
 
     return MP_OBJ_FROM_PTR(o);
 }
+
+MP_DEFINE_CONST_OBJ_TYPE(
+        PicoNumber_type_Number,
+        MP_QSTR_PicoNumber,
+        MP_TYPE_FLAG_NONE,
+        make_new, fix16_make_new,
+        locals_dict, &fix16_locals_dict
+);
+
+STATIC mp_obj_t mp_obj_make_from_string(mp_obj_t a_obj) {
+    mp_buffer_info_t bufinfo;
+    mp_get_buffer(a_obj, &bufinfo, MP_BUFFER_READ);
+    mp_obj_fix16_t *o = mp_obj_malloc(mp_obj_fix16_t, &PicoNumber_type_Number);
+    qnconv(&o->n,(char*)bufinfo.buf,bufinfo.len);
+    return MP_OBJ_FROM_PTR(o);
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_1(mp_obj_make_from_string_obj, mp_obj_make_from_string);
+
+STATIC mp_obj_t mp_obj_make_from_string_b2(mp_obj_t a_obj) {
+    mp_buffer_info_t bufinfo;
+    mp_get_buffer(a_obj, &bufinfo, MP_BUFFER_READ);
+    mp_obj_fix16_t *o = mp_obj_malloc(mp_obj_fix16_t, &PicoNumber_type_Number);
+    qnconvb(&o->n,(char*)bufinfo.buf,bufinfo.len,2);
+    return MP_OBJ_FROM_PTR(o);
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_1(mp_obj_make_from_string_b2_obj, mp_obj_make_from_string_b2);
+
+STATIC mp_obj_t mp_obj_make_from_string_b2(mp_obj_t a_obj) {
+    mp_buffer_info_t bufinfo;
+    mp_get_buffer(a_obj, &bufinfo, MP_BUFFER_READ);
+    mp_obj_fix16_t *o = mp_obj_malloc(mp_obj_fix16_t, &PicoNumber_type_Number);
+    qnconvb(&o->n,(char*)bufinfo.buf,bufinfo.len,2);
+    return MP_OBJ_FROM_PTR(o);
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_1(mp_obj_make_from_string_b2_obj, mp_obj_make_from_string_b2);
+
+STATIC mp_obj_t mp_obj_make_from_string_b16(mp_obj_t a_obj) {
+    mp_buffer_info_t bufinfo;
+    mp_get_buffer(a_obj, &bufinfo, MP_BUFFER_READ);
+    mp_obj_fix16_t *o = mp_obj_malloc(mp_obj_fix16_t, &PicoNumber_type_Number);
+    qnconvb(&o->n,(char*)bufinfo.buf,bufinfo.len,16);
+    return MP_OBJ_FROM_PTR(o);
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_1(mp_obj_make_from_string_b16_obj, mp_obj_make_from_string_b16);
 
 STATIC mp_obj_t fix16_add(mp_obj_t a_obj,mp_obj_t b_obj) {
     // Extract the integer from the MicroPython input object
@@ -253,42 +327,6 @@ STATIC mp_obj_t fix16_notequal(mp_obj_t a_obj,mp_obj_t b_obj) {
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_2(fix16_notequal_obj, fix16_notequal);
 
-STATIC mp_obj_t to_string(mp_obj_t self_in) {
-    mp_obj_fix16_t *self = MP_OBJ_TO_PTR(self_in);
-    char temp[16]; //max length according to the string function docs
-	const int r = qsprint(self->n, temp, sizeof temp);
-    if (r==-1)
-		mp_raise_ValueError(MP_ERROR_TEXT("Could not convert to string"));
-    mp_obj_t obj = mp_obj_new_str(temp,r);
-    return obj;
-}
-STATIC MP_DEFINE_CONST_FUN_OBJ_1(fix16_to_string_obj, to_string);
-
-STATIC mp_obj_t to_bytes(mp_obj_t self_in) {
-    mp_obj_fix16_t *self = MP_OBJ_TO_PTR(self_in);
-    char temp[16]; //max length according to the string function docs
-	const int r = qsprint(self->n, temp, sizeof temp);
-    if (r==-1)
-		mp_raise_ValueError(MP_ERROR_TEXT("Could not convert to string"));
-    mp_obj_t obj = mp_obj_new_bytes((byte *)temp,r);
-    return obj;
-}
-STATIC MP_DEFINE_CONST_FUN_OBJ_1(fix16_to_bytes_obj, to_bytes);
-
-STATIC const mp_rom_map_elem_t fix16_locals_dict_table[] = {
-    { MP_ROM_QSTR(MP_QSTR_tobytes), MP_OBJ_FROM_PTR(&fix16_to_bytes_obj) },
-    { MP_ROM_QSTR(MP_QSTR_tostr), MP_OBJ_FROM_PTR(&fix16_to_string_obj) }
-};
-STATIC MP_DEFINE_CONST_DICT(fix16_locals_dict, fix16_locals_dict_table);
-
-MP_DEFINE_CONST_OBJ_TYPE(
-    PicoNumber_type_Number,
-    MP_QSTR_PicoNumber,
-    MP_TYPE_FLAG_NONE,
-    make_new, fix16_make_new,
-    locals_dict, &fix16_locals_dict
-    );
-
 // Define all attributes of the module.
 // Table entries are key/value pairs of the attribute name (a string)
 // and the MicroPython object reference.
@@ -319,6 +357,9 @@ STATIC const mp_rom_map_elem_t fix16_module_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR_eqmore),    MP_ROM_PTR(&fix16_eqmore_obj) },
     { MP_ROM_QSTR(MP_QSTR_equal),    MP_ROM_PTR(&fix16_equal_obj) },
     { MP_ROM_QSTR(MP_QSTR_notequal),    MP_ROM_PTR(&fix16_notequal_obj) },
+    { MP_ROM_QSTR(MP_QSTR_from_str),    MP_ROM_PTR(&mp_obj_make_from_string_obj) },
+    { MP_ROM_QSTR(MP_QSTR_from_b2_str),    MP_ROM_PTR(&mp_obj_make_from_string_b2_obj) },
+    { MP_ROM_QSTR(MP_QSTR_from_b16_str),    MP_ROM_PTR(&mp_obj_make_from_string_b16_obj) },
 };
 STATIC MP_DEFINE_CONST_DICT(fix16_module_globals, fix16_module_globals_table);
 
